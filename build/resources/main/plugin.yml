@@ -1,0 +1,33 @@
+name: PremiumCheck
+version: '2.0.0'
+main: com.peckot.bukkit.PremiumCheck.PremiumCheck
+softdepend: [ PlaceholderAPI ]
+author: Pectics
+description: To check players' premium state and feedback placeholders.
+website: https://peckot.com
+commands:
+  premium:
+    description: Check a player's premium state.
+    usage: /premium
+    permission: premium.use
+permissions:
+  premium.*:
+    description: Allow to use the plugin.
+    default: op
+    children:
+      premium.use: true
+      premium.other: true
+      premium.check: true
+      premium.reload: true
+  premium.use:
+    description: Allow to use the /premium command.
+    default: true
+  premium.other:
+    description: Allow to use the /premium command on other players.
+    default: op
+  premium.check:
+    description: Allow to use the /premium check command.
+    default: op
+  premium.reload:
+    description: Allow to use the /premium reload command.
+    default: op

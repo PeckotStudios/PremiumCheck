@@ -1,0 +1,87 @@
+# PremiumCheck
+# 这是一个为外置登录与正版登录共存的服务器准备的正版认证插件
+# 它可以检查玩家是否使用了正版登录，并可让玩家自主选择进行正版认证
+# 指令列表：
+#  /premium - 为自己进行正版认证
+#  /premium <玩家名> - 为玩家进行正版认证
+#  /premium check <玩家名> - 检查玩家认证状态
+#  /premium reload - 重载插件和配置文件
+#  /premium help - 查看指令帮助
+# 权限节点：
+#  premium.use - 使用 /premium 命令进行正版认证
+#  premium.other - 使用 /premium <玩家名> 为其他玩家进行正版认证
+#  premium.check - 使用 /premium check 命令检查玩家认证状态
+#  premium.reload - 使用 /premium reload 命令重载插件和配置文件
+# PAPI变量：
+#  %premium_check% - 检查玩家的正版认证状态，返回值 true/false
+#  %premium_check_<player>% - 检查指定玩家的正版认证状态，返回值为 true/false
+
+# 配置文件版本号，请勿修改
+config_version: 2.0.0
+
+# 是否启用 Debug 模式
+debug: false
+
+data:
+  # 玩家数据储存格式，可选值：sqlite, yaml, json
+  type: sqlite
+  # 玩家数据加密方式，可选值：none, md5, base64, sha1
+  # 请勿随意更改，否则将导致玩家数据无法读取
+  encryption: sha1
+
+# 若认证成功后执行的指令，可使用 PlaceholderAPI 变量
+# 由控制台执行，常用于给予权限或称号等
+commands:
+  - tell %player_name% 你完成了正版认证
+  - tell %player_name% 你已经是正版账号了
+
+# 正版玩家 UUID 获取源
+# 由于 Yggdrasil Official Proxy 会对 Mojang 官方的查询接口进行替换，
+# 此处建议使用第三方接口来获取正版玩家 UUID
+# 不同接口和不同的请求位置可能会造成延迟，请自行选择合适的接口
+# 可以使用 {player} {timestamp} 等变量参数
+# 可选范例：
+#   - https://minecraft-api.com/api/uuid/{player}
+#   - https://playerdb.co/api/player/minecraft/{player}
+# 外置登录勿选：
+#   - https://api.mojang.com/users/profiles/minecraft/{player}
+uuid_source:
+  request:
+    # 请求方法，可选值：get, post
+    method: get
+    # 请求地址，可使用 {player} {timestamp} 等变量参数
+    url: https://minecraft-api.com/api/uuid/{player}
+  post_data: # 若 request_method 为 post，此处请设置 post_data
+    header:
+      Content-Type: application/json
+      # Authorization: xxxxxxxxx
+    body:
+      player: {player}
+      timestamp: {timestamp}
+  return:
+    # 接口返回类型，可选值：json, text
+    type: text
+    # 若 return_type 为 json，此处请设置为返回的 json 对象中 uuid 的索引
+    path: data.player.uuid
+
+# 消息提示文本
+messages:
+  no_permission: '&f&l>> &c你没有权限执行此指令'
+  checking: '&f&l>> &a正在进行正版认证,请稍后...'
+  failed: '&f&l>> &cUUID验证失败,无法进行正版认证,若确认你是正版请联系服务器管理员'
+  success: '&f&l>> &a正版认证成功!'
+  already: '&f&l>> &c你已经通过正版认证了!'
+  network_error: '&f&l>> &c无法进行正版认证,网络错误,请稍后再试'
+  config_error: '&f&l>> &c无法进行正版认证,配置文件错误,请联系服务器管理员'
+  player_only: '&f&l>> &c只有玩家才可执行此命令'
+  player_not_found: '&f&l>> &c未找到该玩家'
+  player_premium: '&f&l>> &a该玩家已通过正版认证'
+  player_not_premium: '&f&l>> &c该玩家还未通过正版认证'
+  reloaded: '&f&l>> &a重载配置文件成功!'
+  help: |-
+    &f&l>> &aPremiumCheck
+    &f&l>> &a/premium - 为自己进行正版认证
+    &f&l>> &a/premium (玩家名) - 为玩家进行正版认证
+    &f&l>> &a/premiumcheck [help] - 查看帮助页面
+    &f&l>> &a/premiumcheck (玩家名) - 检查玩家认证状态
+    &f&l>> &a/premiumcheck reload - 重载配置文件
