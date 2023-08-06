@@ -44,7 +44,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.extract_version.outputs.version }}
+          tag_name: v${{ steps.extract_version.outputs.version }}-${{ github.run_id }}
+          unique_tag_name: true
           release_name: Release v${{ steps.extract_version.outputs.version }}
           body: Release v${{ steps.extract_version.outputs.version }}
           draft: false
