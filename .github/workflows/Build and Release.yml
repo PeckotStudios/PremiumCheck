@@ -36,6 +36,7 @@ jobs:
       - name: Build JAR
         run: ./gradlew buildJar
 
+      # Add the action to publish a release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -43,36 +44,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.extract_version.outputs.version }}
-          release_name: Release v${{ steps.extract_version.outputs.version }}
-          draft: false
-          preRelease: false
+          release_name: "Release v${{ steps.extract_version.outputs.version }}"
+          body: "Release v${{ steps.extract_version.outputs.version }}"
 
-      - name: Upload JAR to Release
-        id: upload_jar
-        uses: actions/upload-artifact@v2
-        with:
-          name: PremiumCheck-v${{ steps.extract_version.outputs.version }}.jar
-          path: build/libs/PremiumCheck-v${{ steps.extract_version.outputs.version }}.jar
-
-      - name: Set Release Description
-        id: set_release_description
-        uses: actions/github-script@v4
+      # Upload the build artifact as a release asset
+      - name: Upload Release Asset
+        id: upload_asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const releaseId = "${{ steps.create_release.outputs.id }}";
-            const releaseName = "${{ steps.extract_version.outputs.version }}";
-            const response = await github.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag: `v${releaseName}`
-            });
-            const releaseBody = `Release Notes for v${releaseName}:\n\n` + response.data.body;
-            await github.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: releaseId,
-              body: releaseBody
-            });
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/libs/PremiumCheck-${{ steps.extract_version.outputs.version }}.jar
+          asset_name: PremiumCheck-${{ steps.extract_version.outputs.version }}.jar
+          asset_content_type: application/java-archive
