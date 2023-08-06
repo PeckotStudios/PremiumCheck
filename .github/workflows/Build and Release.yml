@@ -30,6 +30,9 @@ jobs:
         id: extract_version
         run: echo "::set-output name=version::$(grep -oP '(?<=version\s\').*?(?=\')' build.gradle)"
 
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
       - name: Build JAR
         run: ./gradlew buildJar
 
