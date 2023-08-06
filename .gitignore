@@ -20,9 +20,6 @@ out/
 *.war
 *.ear
 
-# Local Gradle distribution
-gradle-*
-
 # Windows-specific
 Thumbs.db
 ehthumbs.db
