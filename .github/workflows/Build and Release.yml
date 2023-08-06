@@ -48,8 +48,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ env:version }}
-          release_name: Release v${{ env:version }}
+          tag_name: v${{ env.VERSION }}
+          release_name: Release v${{ env.VERSION }}
           draft: false
           preRelease: false
 
@@ -57,8 +57,8 @@ jobs:
         id: upload_jar
         uses: actions/upload-artifact@v2
         with:
-          name: PremiumCheck-v${{ env:version }}.jar
-          path: build/libs/PremiumCheck-v${{ env:version }}.jar
+          name: PremiumCheck-v${{ env.VERSION }}.jar
+          path: build/libs/PremiumCheck-v${{ env.VERSION }}.jar
 
       - name: Set Release Description
         id: set_release_description
@@ -69,7 +69,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const releaseId = "${{ steps.create_release.outputs.id }}";
-            const releaseName = "${{ env:version }}";
+            const releaseName = "${{ env.VERSION }}";
             const response = await github.repos.getReleaseByTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
