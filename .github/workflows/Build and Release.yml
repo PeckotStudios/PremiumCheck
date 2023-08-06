@@ -26,9 +26,9 @@ jobs:
           overwrite-settings: true
           job-status: success
 
-      - name: Extract version from build.gradle
+      - name: Extract version
         id: extract_version
-        run: echo "::set-output name=version::$(grep -oP '(?<=version\s\').*?(?=\')' build.gradle)"
+        run: echo "::set-output name=version::$(grep -oP '(?<=version\s).*?(?=\')' build.gradle)"
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
@@ -36,18 +36,17 @@ jobs:
       - name: Build JAR
         run: ./gradlew buildJar
 
-      # Add the action to publish a release
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.extract_version.outputs.version }}
-          release_name: "Release v${{ steps.extract_version.outputs.version }}"
-          body: "Release v${{ steps.extract_version.outputs.version }}"
+          release_name: Release v${{ steps.extract_version.outputs.version }}
+          body: Release v${{ steps.extract_version.outputs.version }}
+          draft: false
+          preRelease: false
 
-      # Upload the build artifact as a release asset
       - name: Upload Release Asset
         id: upload_asset
         uses: actions/upload-release-asset@v1
