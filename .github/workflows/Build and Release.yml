@@ -7,7 +7,7 @@ on:
 
 jobs:
   build_and_release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout repository
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v2
         with:
-          java-version: 11
+          java-version: 8
           distribution: 'adopt'
           architecture: x64
           check-latest: false
@@ -28,13 +28,19 @@ jobs:
 
       - name: Extract version from build.gradle
         id: extract_version
-        run: echo "::set-output name=version::$(grep -oP '(?<=version\s\').*?(?=\')' build.gradle)"
+        run: |
+          $version = Get-Content -Path build.gradle | Select-String -Pattern 'version\s*=\s*"\d+\.\d+\.\d+"'
+          $version = $version -replace 'version\s*=\s*', '' -replace '"', '' -replace '\s', ''
+          Write-Host "Version: $version"
+          echo "##vso[task.setvariable variable=version]$version"
 
       - name: Grant execute permission to gradlew
-        run: chmod +x ./gradlew
+        run: |
+          chmod +x ./gradlew
 
       - name: Build JAR
-        run: ./gradlew buildJar
+        run: |
+          ./gradlew buildJar
 
       - name: Create Release
         id: create_release
@@ -42,17 +48,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.extract_version.outputs.version }}
-          release_name: Release v${{ steps.extract_version.outputs.version }}
+          tag_name: v${{ env:version }}
+          release_name: Release v${{ env:version }}
           draft: false
-          prerelease: false
+          release: false
 
       - name: Upload JAR to Release
         id: upload_jar
         uses: actions/upload-artifact@v2
         with:
-          name: PremiumCheck-v${{ steps.extract_version.outputs.version }}.jar
-          path: build/libs/PremiumCheck-v${{ steps.extract_version.outputs.version }}.jar
+          name: PremiumCheck-v${{ env:version }}.jar
+          path: build/libs/PremiumCheck-v${{ env:version }}.jar
 
       - name: Set Release Description
         id: set_release_description
@@ -63,7 +69,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const releaseId = "${{ steps.create_release.outputs.id }}";
-            const releaseName = "${{ steps.extract_version.outputs.version }}";
+            const releaseName = "${{ env:version }}";
             const response = await github.repos.getReleaseByTag({
               owner: context.repo.owner,
               repo: context.repo.repo,
