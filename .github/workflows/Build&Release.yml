@@ -55,8 +55,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ steps.create_release.outputs.upload_url }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/libs/PremiumCheck-${{ steps.extract_version.outputs.version }}.jar
           asset_name: PremiumCheck-${{ steps.extract_version.outputs.version }}.jar
           asset_content_type: application/java-archive
