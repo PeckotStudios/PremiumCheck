@@ -26,7 +26,7 @@ jobs:
           overwrite-settings: true
           job-status: success
 
-      - name: Extract version
+      - name: Get version
         id: get_version
         run: |
           version=$(grep -oP 'version = \'\d+\.\d+\.\d+\'' build.gradle | cut -d= -f2)
