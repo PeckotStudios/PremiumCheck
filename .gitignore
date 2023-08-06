@@ -16,7 +16,6 @@ out/
 *.log
 
 # Package files
-*.jar
 *.war
 *.ear
 
