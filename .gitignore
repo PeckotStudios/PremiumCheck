@@ -1,3 +1,7 @@
+# Gradle-specific
+.gradle/
+build/
+
 # IntelliJ IDEA
 .idea/
 *.iml
@@ -15,10 +19,6 @@ out/
 *.jar
 *.war
 *.ear
-
-# Gradle Wrapper
-gradle/wrapper/gradle-wrapper.jar
-gradle/wrapper/gradle-wrapper.properties
 
 # Local Gradle distribution
 gradle-*
