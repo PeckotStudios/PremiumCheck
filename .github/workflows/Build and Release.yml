@@ -32,7 +32,7 @@ jobs:
           $version = Get-Content -Path build.gradle | Select-String -Pattern 'version\s*=\s*"\d+\.\d+\.\d+"'
           $version = $version -replace 'version\s*=\s*', '' -replace '"', '' -replace '\s', ''
           Write-Host "Version: $version"
-          echo "##vso[task.setvariable variable=version]$version"
+          echo "##vso[task.setVariable variable=version]$version"
 
       - name: Grant execute permission to gradlew
         run: |
@@ -51,7 +51,7 @@ jobs:
           tag_name: v${{ env:version }}
           release_name: Release v${{ env:version }}
           draft: false
-          release: false
+          preRelease: false
 
       - name: Upload JAR to Release
         id: upload_jar
